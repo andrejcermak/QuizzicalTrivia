@@ -5,7 +5,13 @@ import { Outlet, Link, redirect, useFetcher } from "react-router-dom";
 import React from 'react';
 
 
+
 export default function Quizz() {
+    function decodeHtmlEntities(encodedString) {
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(`<!doctype html><body>${encodedString}`, 'text/html');
+        return dom.body.textContent;
+      }
     const [questions, setQuestions] = useState([])
     const [submitted, setSubmitted] = useState(false)
     const [gameCount, setGameCount] = useState(0)
@@ -17,8 +23,8 @@ export default function Quizz() {
             setQuestions(data.results.map(r => {
                 console.log(data)
                 return {
-                    "answers": r.incorrect_answers.concat(r.correct_answer).map(answer => { return {'text': answer, 'clicked': false, 'id': nanoid()}}),
-                    "question": r.question,
+                    "answers": r.incorrect_answers.concat(r.correct_answer).map(answer => { return {'text': decodeHtmlEntities(answer), 'clicked': false, 'id': nanoid()}}),
+                    "question": decodeHtmlEntities(r.question),
                     "correctAnswer": r.correct_answer,
                     "answerSet" : false,
                     "id": nanoid()
